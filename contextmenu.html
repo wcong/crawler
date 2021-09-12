@@ -1,0 +1,115 @@
+<script>
+var tableElement;
+var pageElement;
+var rightClickElement;
+
+function findFirstTable(e){
+    while(e.parentElement != null && e.parentElement.tagName != 'TABLE'){
+        console.debug(e.tagName);
+        e = e.parentElement;
+    }
+    return e.parentElement;
+}
+
+function setTable(e){
+    console.log("start to set table elemtnt");
+    tableElement = findFirstTable(rightClickElement);
+    $('.crawler_table').removeClass('crawler_table');
+    $(tableElement).addClass('crawler_table');
+    console.log("set table elemtnt");
+}
+
+function setPage(e){
+    pageElement = $(rightClickElement).parent().find("label:contains('下一页')");
+    $('.crawler_page').removeClass('crawler_page');
+    $(pageElement).addClass('crawler_page');
+    console.log("set page elemtnt");
+}
+
+function startCrawler(e){
+    if( document.getElementById('crawler_table').checked &&  document.getElementById('crawler_page').checked){
+        extracTable();
+    }else{
+        alert('please select both table and page element')
+    }
+}
+
+function extracTable(){
+    var currentPage = $('.crawler_page').parent().find('label.cur').text();
+    console.log("current page:"+currentPage);
+    var table = [];
+    table[0] = {}
+    $('.crawler_table').find("th").each(function(index){
+        table[0][index] = $(this).text().replace( /(<([^>]+)>)/ig, '');
+    });
+
+    // Loop through grabbing everything
+    $('.crawler_table').find("tbody tr").each(function(index) {
+        $cells = $(this).find("td");
+        index += 1;
+        table[index] = {};
+
+        $cells.each(function(cellIndex) {
+            // Update the row object with the header/cell combo
+            table[index][cellIndex] = $(this).text().replace( /(<([^>]+)>)/ig, '');
+        });    
+    });
+    console.debug(table);
+    window.receiveTableData(table);
+}
+
+function getPosition(e) {
+  var posx = 0;
+  var posy = 0;
+  if (!e) var e = window.event;
+  if (e.pageX || e.pageY) {
+    posx = e.pageX;
+    posy = e.pageY;
+  } else if (e.clientX || e.clientY) {
+    posx = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
+    posy = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
+  }
+  return { x: posx, y: posy }
+}
+
+document.addEventListener("contextmenu", function(e) {
+      e.preventDefault();
+      var postion = getPosition(e);
+      rightClickElement = e.target;
+      $('#crawler_menu').addClass('context-menu--active').css({"left":postion.x,"top":postion.y});
+});
+</script>
+<nav class="context-menu" id = "crawler_menu">
+    <ul class="context-menu__items">
+      <li class="context-menu__item">
+        <input type="checkbox" id="crawler_table" name="set_crawler_table" onclick="setTable" value="Table">
+      </li>
+      <li class="context-menu__item">
+        <input type="checkbox" id="crawler_page" name="set_crawler_page" onclick="setPage" value="Page">
+      </li>
+      <li class="context-menu__item">
+        <button onclick="startCrawler" id = 'start_crawler'>Start Crawler</button>
+      </li>
+    </ul>
+</nav>
+<style type="text/css">
+    .context-menu {
+        position: absolute;
+        z-index: 10;
+    }
+    .context-menu {
+        display: none;
+        position: absolute;
+        z-index: 10;
+    }
+
+    .context-menu--active {
+        display: block;
+    }
+</style>
+
+<script>
+    $('#crawler_table').on('click',setTable);
+    $('#crawler_page').on('click',setPage);
+    $('#start_crawler').on('click',startCrawler);
+</script>
