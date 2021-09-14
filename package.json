@@ -1,0 +1,27 @@
+{
+  "name": "crawler",
+  "version": "1.0.0",
+  "description": "GUI crawler",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wcong/crawler.git"
+  },
+  "keywords": [
+    "GUI",
+    "crawler"
+  ],
+  "author": "Bruce Wong",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/wcong/crawler/issues"
+  },
+  "homepage": "https://github.com/wcong/crawler#readme",
+  "dependencies": {
+    "puppeteer": "^10.2.0",
+    "sqlite3": "^5.0.2"
+  }
+}
