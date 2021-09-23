@@ -11,16 +11,29 @@ function findFirstTable(e){
     return e.parentElement;
 }
 
+function findFirstElementWithTable(e){
+    var table = findFirstTable(e);
+    if( table == null ){
+        return table;
+    }
+    while(e.parentElement != null && e.parentElement.getElementsByTagName('table').length==1  ){
+        console.debug(e.tagName)
+        e = e.parentElement;
+    }
+    return e;
+}
+
 function setTable(e){
     console.log("start to set table elemtnt");
-    tableElement = findFirstTable(rightClickElement);
-    $('.crawler_table').removeClass('crawler_table');
-    $(tableElement).addClass('crawler_table');
+    tableElement = findFirstElementWithTable(rightClickElement);
+    document.getElementsByClassName('crawler_table').classList.remove('crawler_table');
+    tableElement.classList.add('crawler_table');
     console.log("set table elemtnt");
 }
 
+//:contains('下一页')
 function setPage(e){
-    pageElement = $(rightClickElement).parent().find("label:contains('下一页')");
+    pageElement = rightClickElement.parentElement.querySelector("label");
     $('.crawler_page').removeClass('crawler_page');
     $(pageElement).addClass('crawler_page');
     console.log("set page elemtnt");
@@ -28,6 +41,7 @@ function setPage(e){
 
 function startCrawler(e){
     if( document.getElementById('crawler_table').checked &&  document.getElementById('crawler_page').checked){
+        $('#crawler_menu').removeClass('context-menu--active');
         extracTable();
     }else{
         alert('please select both table and page element')
@@ -95,12 +109,12 @@ document.addEventListener("contextmenu", function(e) {
 <style type="text/css">
     .context-menu {
         position: absolute;
-        z-index: 10;
+        z-index: 1000;
     }
     .context-menu {
         display: none;
         position: absolute;
-        z-index: 10;
+        z-index: 1000;
     }
 
     .context-menu--active {
