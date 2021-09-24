@@ -26,22 +26,39 @@ function findFirstElementWithTable(e){
 function setTable(e){
     console.log("start to set table elemtnt");
     tableElement = findFirstElementWithTable(rightClickElement);
-    document.getElementsByClassName('crawler_table').classList.remove('crawler_table');
+    exitingElements = document.getElementsByClassName('crawler_table');
+    for(const exitingElement of exitingElements){
+        exitingElement.classList.remove('crawler_table')
+    }
     tableElement.classList.add('crawler_table');
     console.log("set table elemtnt");
 }
 
+function findByContent(elementArray, content){
+    result = null;
+    elementArray.forEach(function(element){
+        if(element.innerText.search(content)>=0){
+            result = element
+            console.debug(result);
+        }
+    });
+    return result;
+}
+
 //:contains('下一页')
 function setPage(e){
-    pageElement = rightClickElement.parentElement.querySelector("label");
-    $('.crawler_page').removeClass('crawler_page');
-    $(pageElement).addClass('crawler_page');
+    pageElement = findByContent(rightClickElement.parentElement.querySelectorAll("label"), '下一页');
+    exitingElements = document.getElementsByClassName('crawler_page');
+    for(const exitingElement of exitingElements){
+        exitingElement.classList.remove('crawler_page')
+    }
+    pageElement.classList.add('crawler_page');
     console.log("set page elemtnt");
 }
 
 function startCrawler(e){
     if( document.getElementById('crawler_table').checked &&  document.getElementById('crawler_page').checked){
-        $('#crawler_menu').removeClass('context-menu--active');
+        document.getElementById('crawler_menu').classList.remove('context-menu--active');
         extracTable();
     }else{
         alert('please select both table and page element')
@@ -49,25 +66,25 @@ function startCrawler(e){
 }
 
 function extracTable(){
-    var currentPage = $('.crawler_page').parent().find('label.cur').text();
+    var currentPage = document.getElementsByClassName('crawler_page')[0].parentElement.querySelector('label.cur').innerText;
     console.log("current page:"+currentPage);
     var table = [];
     table[0] = {}
-    $('.crawler_table').find("th").each(function(index){
-        table[0][index] = $(this).text().replace( /(<([^>]+)>)/ig, '');
-    });
+    thArray = document.getElementsByClassName('crawler_table')[0].getElementsByTagName("th");
+    for(var i = 0, size = thArray.length; i < size ; i++){
+        table[0][i] = thArray[i].innerHTML.replace( /(<([^>]+)>)/ig, '');
+    }
 
     // Loop through grabbing everything
-    $('.crawler_table').find("tbody tr").each(function(index) {
-        $cells = $(this).find("td");
+    trArray = document.getElementsByClassName('crawler_table')[0].querySelector("tbody tr");
+    for(var i = 0, size = trArray.length; i < size ; i++){
+        cells = trArray[i].querySelector("td");
         index += 1;
-        table[index] = {};
-
-        $cells.each(function(cellIndex) {
-            // Update the row object with the header/cell combo
-            table[index][cellIndex] = $(this).text().replace( /(<([^>]+)>)/ig, '');
-        });    
-    });
+        table[i] = {};
+        for(var j = 0, tdsize = cells.length; j < size ; j++){
+            table[i][j] = cells[j].innerHTML.replace( /(<([^>]+)>)/ig, '');
+        }
+    }
     console.debug(table);
     window.receiveTableData(table);
 }
@@ -90,7 +107,10 @@ document.addEventListener("contextmenu", function(e) {
       e.preventDefault();
       var postion = getPosition(e);
       rightClickElement = e.target;
-      $('#crawler_menu').addClass('context-menu--active').css({"left":postion.x,"top":postion.y});
+      var menu = document.getElementById('crawler_menu');
+      menu.classList.add('context-menu--active');
+      menu.style.left = postion.x + 'px'
+      menu.style.top = postion.y + 'px'
 });
 </script>
 <nav class="context-menu" id = "crawler_menu">
